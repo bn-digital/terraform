@@ -1,5 +1,3 @@
-provider "digitalocean" {}
-
 resource "digitalocean_tag" "project" {
   name = "project:${var.project}"
 }

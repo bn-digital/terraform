@@ -49,7 +49,7 @@ resource "digitalocean_kubernetes_cluster" "this" {
 
   node_pool {
     name       = "default"
-    tags       = concat(local.tags, digitalocean_tag.controller.name)
+    tags       = concat(local.tags, [digitalocean_tag.controller.name])
     size       = var.cluster_node_size
     auto_scale = false
     node_count = var.cluster_node_count

@@ -10,7 +10,7 @@ provider "helm" {
   }
 }
 
-resource "helm_repository" "ingress-nginx" {
+data "helm_repository" "ingress-nginx" {
   name = "ingress-nginx"
   url  = "https://kubernetes.github.io/ingress-nginx"
 }
@@ -23,7 +23,7 @@ resource "helm_release" "ingress-nginx" {
   name             = "ingress-nginx"
   namespace        = "kube-system"
   chart            = "ingress-nginx"
-  repository       = helm_repository.ingress-nginx.name
+  repository       = data.helm_repository.ingress-nginx.name
   wait             = true
   cleanup_on_fail  = true
   create_namespace = true

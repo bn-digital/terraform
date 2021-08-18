@@ -10,11 +10,6 @@ provider "helm" {
   }
 }
 
-data "helm_repository" "ingress-nginx" {
-  name = "ingress-nginx"
-  url  = "https://kubernetes.github.io/ingress-nginx"
-}
-
 locals {
   ingress_service_annotation_group = "service\\.beta\\.kubernetes\\.io"
 }
@@ -23,7 +18,7 @@ resource "helm_release" "ingress-nginx" {
   name             = "ingress-nginx"
   namespace        = "kube-system"
   chart            = "ingress-nginx"
-  repository       = data.helm_repository.ingress-nginx.name
+  repository       = "https://kubernetes.github.io/ingress-nginx"
   wait             = true
   cleanup_on_fail  = true
   create_namespace = true

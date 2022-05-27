@@ -1,0 +1,84 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: 'Used by Vault to import secrets from'
+        required: false
+        default: production
+      provider:
+        type: string
+        description: 'One of: digitalocean'
+        required: false
+        default: digitalocean
+      domain:
+        type: string
+        description: 'Application domain name'
+        required: false
+        default: ${{ github.event.repository.name }}.bndigital.ai
+      context:
+        type: string
+        description: 'Terraform working dir'
+        required: false
+        default: packages/cloud
+      secrets:
+        type: string
+        description: 'Additional key-value map of Value secret paths & names which will be mapped to env variables'
+        required: false
+
+concurrency:
+  group: ${{ github.event.repository.name }}-terraform
+  cancel-in-progress: false
+
+env:
+  APP_NAME: ${{ github.event.repository.name }}
+  APP_ENV: ${{ inputs.environment }}
+  DOMAIN: ${{ inputs.domain }}
+
+defaults:
+  run:
+    working-directory: ${{ inputs.context }}
+
+jobs:
+  terraform:
+    runs-on: self-hosted
+    env:
+      TF_VAR_project: ${{ env.APP_NAME }}
+      TF_VAR_environment: ${{ env.APP_ENV }}
+      TF_VAR_domain: ${{ env.DOMAIN }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Import Vault secrets
+        uses: hashicorp/vault-action@v2.4.0
+        if: inputs.provider == 'digitalocean'
+        continue-on-error: true
+        with:
+          method: github
+          url: ${{ secrets.VAULT_ENDPOINT }}
+          githubToken: ${{ secrets.GH_TOKEN }}
+          secrets: |
+            infrastructure/data/bndigital/${{ env.APP_ENV }}/spaces                 access-key-id             | AWS_ACCESS_KEY_ID ;
+            infrastructure/data/bndigital/${{ env.APP_ENV }}/spaces                 secret-access-key         | AWS_SECRET_ACCESS_KEY ;
+            projects/data/${{ env.APP_NAME }}/${{ env.APP_ENV }}/digitalocean.com   token                     | TF_VAR_digitalocean_token ;
+            projects/data/${{ env.APP_NAME }}/${{ env.APP_ENV }}/digitalocean.com   domain                    | TF_VAR_domain ;
+            projects/data/${{ env.APP_NAME }}/${{ env.APP_ENV }}/digitalocean.com   spaces-access-key-id      | TF_VAR_spaces_access_key_id ;
+            projects/data/${{ env.APP_NAME }}/${{ env.APP_ENV }}/digitalocean.com   spaces-secret-access-key  | TF_VAR_spaces_secret_access_key ;
+            projects/data/${{ env.APP_NAME }}/${{ env.APP_ENV }}/digitalocean.com   region                    | TF_VAR_cluster_region ;
+            ${{ inputs.secrets }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Init providers
+        run: terraform init
+
+      - name: Validate code
+        run: terraform validate -no-color
+
+      - name: Plan infrastructure changes
+        run: terraform plan -input=false
+
+      - name: Apply Terraform plan
+        run: terraform apply -auto-approve -input=false

@@ -30,10 +30,9 @@ jobs:
     uses: bn-digital/terraform/.github/workflows/provision-infrastructure.yml@latest
     secrets: inherit
     env:
-      DIGITALOCEAN_API_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_ACCESS_KEY }}
-      TF_VAR_domain: ${{ secrets.DOMAIN }}
+      DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+      SPACES_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY_ID }}
+      SPACES_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_ACCESS_KEY }}
     with:
       domain: example.com # Could be stored as Github Secret - use then ${{ secrets.DOMAIN }}
       provider: digitalocean
@@ -44,7 +43,7 @@ jobs:
 
 #### Environment Variables
 
-- `DIGITALOCEAN_API_TOKEN`
+- `DIGITALOCEAN_TOKEN`
 - `SPACES_ACCESS_KEY_ID`
 - `SPACES_SECRET_ACCESS_KEY`
 
@@ -55,11 +54,13 @@ jobs:
 ```terraform
 
 locals {
-  app_name =basename(dirname("${path.cwd}/../../"))
+  app_name = basename(dirname("${path.cwd}/../../"))
+  domain = var.domain == "" ? "${local.app_name}.bndigital.ai" : var.domain 
 }
 
 variable "domain" {
   type = string
+  default = ""
 }
 
 variable "environment" {
@@ -91,7 +92,7 @@ provider "digitalocean" { }
 ```terraform
 
 module "digitalocean" {
-  source = "github.com/bn-digital/terraform//digitalocean@latest"
+  source = "github.com/bn-digital/terraform//digitalocean"
 
   project =  local.project
   environment = var.environment

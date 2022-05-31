@@ -31,9 +31,12 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  APP_NAME: ${{ github.event.repository.name }}
   APP_ENV: ${{ inputs.environment }}
+  APP_NAME: ${{ github.event.repository.name }}
   DOMAIN: ${{ inputs.domain }}
+  TF_VAR_domain: ${{ inputs.domain }}
+  TF_VAR_environment: ${{ inputs.environment }}
+  TF_VAR_project: ${{ github.event.repository.name }}
 
 defaults:
   run:
@@ -42,10 +45,6 @@ defaults:
 jobs:
   terraform:
     runs-on: self-hosted
-    env:
-      TF_VAR_project: ${{ env.APP_NAME }}
-      TF_VAR_environment: ${{ env.APP_ENV }}
-      TF_VAR_domain: ${{ env.DOMAIN }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
@@ -59,11 +58,11 @@ jobs:
           url: ${{ secrets.VAULT_ENDPOINT }}
           githubToken: ${{ secrets.GH_TOKEN }}
           secrets: |
-            infrastructure/data/bndigital/${{ env.APP_ENV }}/spaces                       access-key-id             | AWS_ACCESS_KEY_ID ;
-            infrastructure/data/bndigital/${{ env.APP_ENV }}/spaces                       secret-access-key         | AWS_SECRET_ACCESS_KEY ;
-            projects/data/${{ env.APP_NAME }}/${{ env.APP_ENV }}/${{ inputs.provider }}   token                     | DIGITALOCEAN_TOKEN ;
-            projects/data/${{ env.APP_NAME }}/${{ env.APP_ENV }}/${{ inputs.provider }}   spaces-access-key-id      | SPACES_ACCESS_KEY_ID ;
-            projects/data/${{ env.APP_NAME }}/${{ env.APP_ENV }}/${{ inputs.provider }}   spaces-secret-access-key  | SPACES_SECRET_ACCESS_KEY ;
+            infrastructure/data/bndigital/${{ inputs.environment }}/spaces                       access-key-id             | AWS_ACCESS_KEY_ID ;
+            infrastructure/data/bndigital/${{ inputs.environment }}/spaces                       secret-access-key         | AWS_SECRET_ACCESS_KEY ;
+            projects/data/${{ env.APP_NAME }}/${{ inputs.environment }}/${{ inputs.provider }}   token                     | DIGITALOCEAN_TOKEN ;
+            projects/data/${{ env.APP_NAME }}/${{ inputs.environment }}/${{ inputs.provider }}   spaces-access-key-id      | SPACES_ACCESS_KEY_ID ;
+            projects/data/${{ env.APP_NAME }}/${{ inputs.environment }}/${{ inputs.provider }}   spaces-secret-access-key  | SPACES_SECRET_ACCESS_KEY ;
             ${{ inputs.secrets }}
 
       - name: Setup Terraform

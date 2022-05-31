@@ -27,7 +27,7 @@ module "cluster" {
 }
 
 module "domain" {
-  count = var.domain ? 1 : 0
+  count = var.domain == "" ? 1 : 0
 
   source = "./domain"
 

@@ -4,7 +4,7 @@ data "digitalocean_kubernetes_versions" "current" {
 
 locals {
   infrastructure = {
-    project = lower(var.project)
+    project     = lower(var.project)
     environment = lower(var.environment)
     provisioner = lower("Terraform")
   }
@@ -21,12 +21,14 @@ module "cluster" {
 
   project         = local.infrastructure.project
   environment     = local.infrastructure.environment
-  region          = var.region == "us" ? "nyc3" : "fra1"
+  region          = var.region == "us" ? "nyc3" : (var.region == "eu" ? "fra1" : var.region)
   cluster_version = var.kubernetes_version == "latest" ? data.digitalocean_kubernetes_versions.current.latest_version : var.kubernetes_version
   tags            = local.tags
 }
 
 module "domain" {
+  count = var.domain ? 1 : 0
+
   source = "./domain"
 
   domain  = var.domain
@@ -40,7 +42,14 @@ resource "digitalocean_project" "this" {
   description = "${local.infrastructure.project} web app ${local.infrastructure.environment} environment"
 }
 
-resource "digitalocean_project_resources" "this" {
+resource "digitalocean_project_resources" "cluster" {
   project   = digitalocean_project.this.name
-  resources = concat(module.cluster.resources, module.domain.resources)
+  resources = module.cluster.resources
+}
+
+resource "digitalocean_project_resources" "domain" {
+  count = var.domain ? 1 : 0
+
+  project   = digitalocean_project.this.name
+  resources = module.domain.resources
 }

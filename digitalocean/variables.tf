@@ -47,18 +47,19 @@ variable "environment" {
 
 variable "domain" {
   type        = string
+  default     = ""
   description = "Primary application domain name"
 }
 
 variable "domain_records" {
-  type        = map(object({
+  type = map(object({
     name     = string,
     value    = string,
     type     = string,
     priority = number
   }))
   description = "Domain records"
-  default = {}
+  default     = {}
 }
 
 variable "region" {

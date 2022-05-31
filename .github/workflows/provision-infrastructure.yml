@@ -16,11 +16,6 @@ on:
         description: 'Application domain name'
         required: false
         default: ${{ github.event.repository.name }}.bndigital.ai
-      context:
-        type: string
-        description: 'Terraform working dir'
-        required: false
-        default: packages/cloud
       secrets:
         type: string
         description: 'Additional key-value map of Value secret paths & names which will be mapped to env variables'
@@ -40,7 +35,7 @@ env:
 
 defaults:
   run:
-    working-directory: ${{ inputs.context }}
+    working-directory: packages/cloud
 
 jobs:
   terraform:

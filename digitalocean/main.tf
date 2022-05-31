@@ -46,10 +46,3 @@ resource "digitalocean_project_resources" "cluster" {
   project   = digitalocean_project.this.name
   resources = module.cluster.resources
 }
-
-resource "digitalocean_project_resources" "domain" {
-  count = var.domain ? 1 : 0
-
-  project   = digitalocean_project.this.name
-  resources = module.domain.resources
-}

@@ -7,7 +7,7 @@ resource "digitalocean_vpc" "this" {
 
 resource "digitalocean_spaces_bucket" "this" {
   name   = "${var.project}-cms"
-  region = var.region
+  region = var.region == "lon1" ? "ams3" : var.region
   acl    = "public-read"
 
   versioning {

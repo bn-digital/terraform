@@ -41,8 +41,3 @@ resource "digitalocean_project" "this" {
   purpose     = "Web Application"
   description = "${local.infrastructure.project} web app ${local.infrastructure.environment} environment"
 }
-
-resource "digitalocean_project_resources" "cluster" {
-  project   = digitalocean_project.this.name
-  resources = module.cluster.resources
-}

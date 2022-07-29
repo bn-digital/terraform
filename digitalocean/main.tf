@@ -1,7 +1,3 @@
-data "digitalocean_kubernetes_versions" "current" {
-  version_prefix = var.kubernetes_version
-}
-
 locals {
   infrastructure = {
     project     = lower(var.project)
@@ -22,7 +18,7 @@ module "cluster" {
   project         = local.infrastructure.project
   environment     = local.infrastructure.environment
   region          = var.region == "us" ? "nyc3" : (var.region == "eu" ? "fra1" : var.region)
-  cluster_version = var.kubernetes_version == "latest" ? data.digitalocean_kubernetes_versions.current.latest_version : var.kubernetes_version
+  cluster_version = var.kubernetes_version
   tags            = local.tags
 }
 

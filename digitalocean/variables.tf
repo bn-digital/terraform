@@ -77,5 +77,5 @@ variable "google_managed_mail" {
 variable "kubernetes_version" {
   type        = string
   description = "DigitalOcean patched kubernetes version (one of: latest | 1.xx.x-do.x)"
-  default     = "1.22.8-do.1"
+  default     = "1.23.9-do.0"
 }

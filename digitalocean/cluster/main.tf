@@ -1,4 +1,3 @@
-
 resource "digitalocean_vpc" "this" {
   region      = var.region
   name        = "${var.project}-newtwork"
@@ -13,6 +12,31 @@ resource "digitalocean_spaces_bucket" "this" {
   versioning {
     enabled = false
   }
+}
+
+resource "digitalocean_spaces_bucket_policy" "this" {
+  bucket = digitalocean_spaces_bucket.this.name
+  region = digitalocean_spaces_bucket.this.region
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "CmsUploadAcl",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:PutObjectAcl"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${digitalocean_spaces_bucket.this.name}",
+          "arn:aws:s3:::${digitalocean_spaces_bucket.this.name}/*"
+        ]
+      }
+    ]
+  })
 }
 
 resource "digitalocean_kubernetes_cluster" "this" {

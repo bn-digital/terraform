@@ -51,7 +51,9 @@ resource "digitalocean_kubernetes_cluster" "this" {
     name       = "workers"
     tags       = var.tags
     size       = var.cluster_node_size
-    node_count = var.cluster_node_count
+    auto_scale = true
+    min_nodes  = var.cluster_node_count
+    max_nodes  = var.cluster_node_count + 1
   }
 
   lifecycle {

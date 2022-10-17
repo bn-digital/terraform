@@ -1,7 +1,7 @@
 data "digitalocean_kubernetes_versions" "this" {}
 
 locals {
-  kubernetes_version = var.cluster_version ? var.cluster_version : data.digitalocean_kubernetes_versions.this.latest_version
+  kubernetes_version = var.cluster_version == "" ? var.cluster_version : data.digitalocean_kubernetes_versions.this.latest_version
 }
 
 resource "digitalocean_vpc" "this" {

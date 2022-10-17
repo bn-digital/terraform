@@ -36,5 +36,5 @@ variable "cluster_node_count" {
 variable "cluster_version" {
   type    = string
   description = "DigitalOcean patched kubernetes version"
-  default = "1.22.8-do.1"
+  default = "1.24.4-do.0"
 }

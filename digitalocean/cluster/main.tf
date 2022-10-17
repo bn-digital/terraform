@@ -1,3 +1,9 @@
+data "digitalocean_kubernetes_versions" "this" {}
+
+locals {
+  kubernetes_version = var.cluster_version ? var.cluster_version : data.digitalocean_kubernetes_versions.this.latest_version
+}
+
 resource "digitalocean_vpc" "this" {
   region      = var.region
   name        = "${var.project}-newtwork"
@@ -57,7 +63,7 @@ resource "digitalocean_kubernetes_cluster" "this" {
   }
 
   lifecycle {
-    ignore_changes = [region]
+    ignore_changes = [region, version, name]
   }
 
 }

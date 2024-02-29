@@ -2,7 +2,7 @@ repo_name: bn-digital/terraform
 report_id: d6de6c8b61ec766cbc180106e87665d0
 version: 0.1
 repo_type: Public
-timestamp: '2024-01-05T08:55:33+00:00'
+timestamp: '2024-02-29T18:33:51+00:00'
 requested_by: vladyslavvolkov
 provider: github
 branch: latest
